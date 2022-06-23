@@ -7,14 +7,22 @@ import requests from '../utils/requests'
 import Row from '../components/Row'
 import useAuth from '../hooks/useAuth'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { modalState } from '../atoms/modalAtoms'
+import { modalState, movieState } from '../atoms/modalAtoms'
 import Modal from '../components/Modal'
+import Plans from '../components/Plans'
+import useList from '../hooks/useList'
 
 export default function Home({netflixOriginals,trendingNow,topRated,actionMovies,comedyMovies,horrorMovies,romanceMovies,documentaries}) {
   const {loading,signUp} = useAuth()
   const [showModal,setShowModal] = useRecoilState(modalState)
-
-  if (loading) return null
+  const {currentMovie,setCurrentMovie} = useRecoilState(movieState)
+  const subscription = true 
+  const {user} = useAuth()
+  const list = useList(user?.uid)
+  // if (loading || subscription === null) return null
+  // implement stripe to further change
+  if (!subscription) return(<Plans/>)
+  
   return (
     <div className='relative h-screen bg-gradient-to-b from-gray-900/10 to-[#010511] lg:h-[140vh]' >
       <Head>
@@ -27,7 +35,7 @@ export default function Home({netflixOriginals,trendingNow,topRated,actionMovies
           <Row title="Trending Now" movies={trendingNow} />
           <Row title="Top Rated" movies={topRated} />
           <Row title="Action Thrillers" movies={actionMovies} />
-          {/* My List */}
+          {list.length > 0 && <Row title='My List' movies={list}/>}
           <Row title="Comedies" movies={comedyMovies} />
           <Row title="Scary Movies" movies={horrorMovies} />
           <Row title="Romance Movies" movies={romanceMovies} />
